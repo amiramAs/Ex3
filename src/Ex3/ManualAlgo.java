@@ -1,5 +1,6 @@
 package Ex3;
 
+import exe.ex3.game.GhostCL;
 import exe.ex3.game.PacManAlgo;
 import exe.ex3.game.PacmanGame;
 import exe.ex3.game.StdDraw;
@@ -22,13 +23,24 @@ public class ManualAlgo implements PacManAlgo{
         if (StdDraw.isKeyPressed(KeyEvent.VK_LEFT)) {ans = PacmanGame.LEFT;}
         if (StdDraw.isKeyPressed(KeyEvent.VK_RIGHT)) {ans = PacmanGame.RIGHT;}
 
+        if (cmd != null) {
+            if (cmd == 'w') {ans = PacmanGame.UP;}
+            if (cmd == 's') {ans = PacmanGame.DOWN;}
+            if (cmd == 'a') {ans = PacmanGame.LEFT;}
+            if (cmd == 'd') {ans  = PacmanGame.RIGHT;}
+        }
 
-            if (cmd != null) {
-                if (cmd == 'w') {ans = PacmanGame.UP;}
-                if (cmd == 's') {ans = PacmanGame.DOWN;}
-                if (cmd == 'a') {ans = PacmanGame.LEFT;}
-                if (cmd == 'd') {ans = PacmanGame.RIGHT;}
-            }
-            return  ans;
+        GhostCL[] ghosts = game.getGhosts(0);
+        printGhosts(ghosts);
+
+
+
+        return  ans;
+    }
+    private static void printGhosts(GhostCL[] gs) {
+        for(int i=0;i<gs.length;i++){
+            GhostCL g = gs[i];
+            System.out.println(i+") status: "+g.getStatus()+",  type: "+g.getType()+",  pos: "+g.getPos(0)+",  time: "+g.remainTimeAsEatable(0));
+        }
     }
 }

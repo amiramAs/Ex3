@@ -29,25 +29,69 @@ public class Ex3Algo implements PacManAlgo{
 	 * This ia the main method - that you should design, implement and test.
 	 */
 	public int move(PacmanGame game) {
-		if(_count==0 || _count==300) {
-			int code = 0;
-			int[][] board = game.getGame(0);
-			printBoard(board);
-			int blue = Game.getIntColor(Color.BLUE, code);
-			int pink = Game.getIntColor(Color.PINK, code);
-			int black = Game.getIntColor(Color.BLACK, code);
-			int green = Game.getIntColor(Color.GREEN, code);
+        int state=1;
+        int[][] board = game.getGame(0);
+        int up = Game.UP, left = Game.LEFT, down = Game.DOWN, right = Game.RIGHT;
+        int code = 0;
+
+        int blue = Game.getIntColor(Color.BLUE, code);
+        int pink = Game.getIntColor(Color.PINK, code);
+        int black = Game.getIntColor(Color.BLACK, code);
+        int green = Game.getIntColor(Color.GREEN, code);
+        String pos = game.getPos(code).toString();
+        GhostCL[] ghosts = game.getGhosts(code);
+        printGhosts(ghosts); 
+
+
+        if(_count==0 || _count==300) {
+            printBoard(board);
 			System.out.println("Blue=" + blue + ", Pink=" + pink + ", Black=" + black + ", Green=" + green);
-			String pos = game.getPos(code).toString();
 			System.out.println("Pacman coordinate: "+pos);
-			GhostCL[] ghosts = game.getGhosts(code);
 			printGhosts(ghosts);
-			int up = Game.UP, left = Game.LEFT, down = Game.DOWN, right = Game.RIGHT;
 		}
-		_count++;
-		int dir = randomDir();
+
+        _count++;
+//		int dir = randomDir();
+
+        int dir=1;
+        if (state == 1) {
+            dir = closestColor(board,posInt(pos),pink,blue);
+        }
 		return dir;
 	}
+
+    private static int closestColor(int[][] board, Index2D pos,int color, int colorAbs){
+        int ans=0;
+        int up = Game.UP, left = Game.LEFT, down = Game.DOWN, right = Game.RIGHT;
+
+        Map map = new Map(board);
+
+        Index2D target = pixelOfColor(map,color,colorAbs,pos);
+        Pixel2D[] path = map.shortestPath(pos,target,colorAbs);
+
+        if(path[1].getX()>pos.getX()){
+            ans=right;
+        }
+        if(path[1].getX()<pos.getX()){
+            ans=left;
+        }
+        if(path[1].getY()>pos.getY()){
+            ans=up;
+        }
+        if(path[1].getY()<pos.getY()){
+            ans=down;
+        }
+
+        if(path[0].getX()==0&&path[1].getX()!=1){
+            ans=left;
+        }
+        if(path[0].getX()==22&&path[1].getX()!=21){
+            ans=right;
+        }
+
+        return ans;
+    }
+
 	private static void printBoard(int[][] b) {
 		for(int y =0;y<b[0].length;y++){
 			for(int x =0;x<b.length;x++){
@@ -57,15 +101,49 @@ public class Ex3Algo implements PacManAlgo{
 			System.out.println();
 		}
 	}
+
 	private static void printGhosts(GhostCL[] gs) {
 		for(int i=0;i<gs.length;i++){
 			GhostCL g = gs[i];
 			System.out.println(i+") status: "+g.getStatus()+",  type: "+g.getType()+",  pos: "+g.getPos(0)+",  time: "+g.remainTimeAsEatable(0));
 		}
 	}
+
 	private static int randomDir() {
 		int[] dirs = {Game.UP, Game.LEFT, Game.DOWN, Game.RIGHT};
 		int ind = (int)(Math.random()*dirs.length);
 		return dirs[ind];
 	}
+
+    private static Index2D posInt(String pos) {
+        String[] parts = pos.replace("(", "")
+                .replace(")", "")
+                .split(",");
+        int x = Integer.parseInt(parts[0].trim());
+        int y = Integer.parseInt(parts[1].trim());
+        return new Index2D (x,y);
+    }
+
+    private static Index2D pixelOfColor(Map map , int color, int colorAbs, Index2D pos) {
+        Index2D ans=null;
+
+        Map2D all = map.allDistance(pos,colorAbs);
+        int[][] board= map.getMap();
+        int[][] allMatrix = all.getMap();
+
+        for(int x=0;x<allMatrix.length;x++){
+            for(int y=0;y<allMatrix[0].length;y++){
+                if(board[x][y]==color) {
+                    if (ans == null) {
+                        ans = new Index2D(x, y);
+                    }
+                    if (allMatrix[x][y] -1 < allMatrix[ans.getX()][ans.getY()]) {
+                        ans = new Index2D(x, y);
+                    }
+                }
+            }
+        }
+
+        return ans;
+    }
 }
