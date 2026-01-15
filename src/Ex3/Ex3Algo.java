@@ -58,24 +58,19 @@ public class Ex3Algo implements PacManAlgo{
 
         state=findState(map,ghosts,pos2D,blue);
         if (state == 1||state == 3) {
-            Pixel2D[] path = closestColor(board,pos2D,pink,blue);
+            Pixel2D[] path = closestColor(map,pos2D,pink,blue);
             dir = goPath(path);
         }
         if (state == 2) {
-            Pixel2D[] path = runWay(map, ghosts, pos2D, blue);
+            Pixel2D[] path = runWay(map, ghosts, pos2D, pink, blue);
             dir = goPath(path);
         }
-        // if (state == 3) {
-          //  Pixel2D[] path = eatGhost(map, ghosts, pos2D, blue);
-            //dir = goPath(path);
-        //}
+
 		return dir;
 	}
 
-    private static Pixel2D[] closestColor(int[][] board, Index2D pos,int color, int colorAbs){
+    private static Pixel2D[] closestColor(Map map, Index2D pos,int color, int colorAbs){
         Pixel2D[] ans=null;
-
-        Map map = new Map(board);
 
         Index2D target = pixelOfColor(map,color,colorAbs,pos);
         ans =map.shortestPath(pos,target,colorAbs);
@@ -118,11 +113,11 @@ public class Ex3Algo implements PacManAlgo{
             Index2D ghostPos = posInt(ghosts[i].getPos(0));
             int dis = allDis.getPixel(ghostPos);
 
-            if(ghosts[i].getStatus()==1 && dis<6 && ghosts[i].remainTimeAsEatable(0)<1.5) {
+            if(ghosts[i].getStatus()==1 && dis<6 && ghosts[i].remainTimeAsEatable(0)<1.6) {
                 ans=2;
             }
 
-            if(ghosts[i].getStatus()==1 && dis<6 && ghosts[i].remainTimeAsEatable(0)>1.5){
+            if(ghosts[i].getStatus()==1 && dis<6  && ghosts[i].remainTimeAsEatable(0)>1.6){
                 ans=3;
             }
         }
@@ -151,88 +146,44 @@ public class Ex3Algo implements PacManAlgo{
         return ans;
     }
 
-    private Pixel2D[] runWay(Map map,GhostCL[] ghosts,Index2D pos, int colorAbs){
+    private Pixel2D[] runWay(Map map,GhostCL[] ghosts,Index2D pos,int color, int colorAbs){
         Pixel2D[] ans = null;
-
-        int nearDis=6;
-        Index2D nearPos = null;
-
-        Map2D allDis = map.allDistance(pos,colorAbs);
-
-        for (int i=0; i<ghosts.length; i++) {
-            Index2D ghostPos = posInt(ghosts[i].getPos(0));
-            int dis = allDis.getPixel(ghostPos);
-
-            if (ghosts[i].getStatus() == 1 && dis!=-1 && dis < nearDis ) {
-                nearDis = dis;
-                nearPos = ghostPos;
-            }
-        }
-
-        Map2D disFromG = map.allDistance(nearPos,colorAbs);
 
         for (int i=0; i<ghosts.length; i++) {
             Index2D ghostPos = posInt(ghosts[i].getPos(0));
             map.setPixel(ghostPos, colorAbs);
         }
 
-        Index2D maxPos= new Index2D(0,0);
+        ans = closestColor(map,pos,color,colorAbs);
 
-        for (int x=0; x<disFromG.getWidth(); x++) {
-            for (int y=0; y<disFromG.getHeight(); y++) {
-                int dis = disFromG.getPixel(x,y);
-                int max = disFromG.getPixel(maxPos);
-                if (dis>max) {
-                    maxPos= new Index2D(x,y);
-                }
+        if(ans==null){
+            ans =getEmergencyMove(map, pos, colorAbs);
+        }
+
+        return ans;
+    }
+
+    private Pixel2D[] getEmergencyMove(Map map, Index2D pos, int colorAbs) {
+        Pixel2D[] ans =null;
+        int x = pos.getX();
+        int y = pos.getY();
+
+        int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+
+        for (int i=0; i<directions.length; i++) {
+            int nextX = x + directions[i][0];
+            int nextY = y + directions[i][1];
+
+            if (nextX < 0) nextX = 22;
+            if (nextX > 22) nextX = 0;
+
+            Index2D target = new Index2D(nextX, nextY);
+
+            if (map.isInside(target) && map.getPixel(target) != colorAbs) {
+                ans = new Pixel2D[] { pos, target };
             }
         }
 
-        ans = map.shortestPath(pos,maxPos,colorAbs);
-
-        if(ans==null) {
-            int max = 0;
-
-            if (pos.getX() == 0) {
-                if (disFromG.getPixel(22, pos.getY()) > max) {
-                    Index2D nextPos = new Index2D(22, pos.getY());
-                    ans = new Pixel2D[]{pos, nextPos};
-                    max = disFromG.getPixel(nextPos);
-                }
-            } else {
-                if (disFromG.getPixel(pos.getX() - 1, pos.getY()) > max) {
-                    Index2D nextPos = new Index2D(pos.getX() - 1, pos.getY());
-                    ans = new Pixel2D[]{pos, nextPos};
-                    max = disFromG.getPixel(nextPos);
-                }
-            }
-
-            if (pos.getX() == 22) {
-                if (disFromG.getPixel(0, pos.getY()) > max) {
-                    Index2D nextPos = new Index2D(0, pos.getY());
-                    ans = new Pixel2D[]{pos, nextPos};
-                    max = disFromG.getPixel(nextPos);
-                }
-            } else {
-                if (disFromG.getPixel(pos.getX() + 1, pos.getY()) > max) {
-                    Index2D nextPos = new Index2D(pos.getX() + 1, pos.getY());
-                    ans = new Pixel2D[]{pos, nextPos};
-                    max = disFromG.getPixel(nextPos);
-                }
-            }
-
-            if (disFromG.getPixel(pos.getX(), pos.getY() - 1) > max) {
-                Index2D nextPos = new Index2D(pos.getX(), pos.getY() - 1);
-                ans = new Pixel2D[]{pos, nextPos};
-                max = disFromG.getPixel(nextPos);
-            }
-
-            if (disFromG.getPixel(pos.getX(), pos.getY() + 1) > max) {
-                Index2D nextPos = new Index2D(pos.getX(), pos.getY() + 1);
-                ans = new Pixel2D[]{pos, nextPos};
-                max = disFromG.getPixel(nextPos);
-            }
-        }
         return ans;
     }
 
