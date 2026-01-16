@@ -5,12 +5,15 @@ public class Index2D implements Pixel2D {
     public Index2D() {this(0,0);}
     public Index2D(int x, int y) {_x=x;_y=y;}
     public Index2D(Pixel2D t) {this(t.getX(), t.getY());}
+
     @Override
-    public int getX() {
-        return _x;
-    }
+    public int getX() {return _x;}
     @Override
     public int getY() {return _y;}
+
+    public void setX(int x) {_x = x;}
+    public void setY(int y) {_y = y;}
+
     public double distance2D(Pixel2D t) {
         double ans = 0;
         double dx = t.getX() - _x;
