@@ -67,40 +67,45 @@ public class MyGame implements PacmanGame {
     @Override
     public String move(int i) {
         String ans="";
+        Index2D nextPos = new Index2D(_pos);
         if (_status==PLAY) {
             if (i == UP) {
                 if (_pos.getY() < _map.getHeight() - 1) {
-                    _pos.setY(_pos.getY() + 1);
+                    nextPos.setY(_pos.getY() + 1);
                 } else {
-                    _pos.setY(0);
+                    nextPos.setY(0);
                 }
                 _dir = 90;
             }
             if (i == DOWN) {
                 if (_pos.getY() > 0) {
-                    _pos.setY(_pos.getY() - 1);
+                    nextPos.setY(_pos.getY() - 1);
                 } else {
-                    _pos.setY(_map.getHeight() - 1);
+                    nextPos.setY(_map.getHeight() - 1);
                 }
                 _dir = 270;
             }
 
             if (i == RIGHT) {
                 if (_pos.getX() < _map.getWidth() - 1) {
-                    _pos.setX(_pos.getX() + 1);
+                    nextPos.setX(_pos.getX() + 1);
                 } else {
-                    _pos.setX(0);
+                    nextPos.setX(0);
                 }
                 _dir = 0;
             }
 
             if (i == LEFT) {
                 if (_pos.getX() > 0) {
-                    _pos.setX(_pos.getX() - 1);
+                    nextPos.setX(_pos.getX() - 1);
                 } else {
-                    _pos.setX(_map.getWidth() - 1);
+                    nextPos.setX(_map.getWidth() - 1);
                 }
                 _dir = 180;
+            }
+
+            if(_map.getPixel(nextPos) != BLUE) {
+                _pos=nextPos;
             }
 
             if (_map.getPixel(_pos) == PINK) {
@@ -119,6 +124,21 @@ public class MyGame implements PacmanGame {
 //            }
 //        }
         }
+
+        boolean remainPink=false;
+        int[][] board=_map.getMap();
+        for(int x=0;x<board.length;x++){
+            for(int y=0;y<board[x].length;y++){
+                if(board[x][y]==PINK){
+                    remainPink=true;
+                }
+            }
+        }
+
+        if(!remainPink){
+            _status=DONE;
+        }
+
         return ans;
     }
 

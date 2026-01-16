@@ -9,13 +9,42 @@ import java.awt.event.KeyEvent;
 
 public class myMain {
     public static void main(String[] args) {
-        int rows = 20;
-        int cols = 20;
-        Map map = new Map(rows, cols,  MyGame.PINK);
+
+        int[][] mapData = {
+                {0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0},
+                {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+                {0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 3, 0},
+                {0, 3, 0, 2, 0, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 0, 3, 0},
+                {0, 3, 0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 0, 3, 0, 3, 0},
+                {0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 3, 0, 3, 0},
+                {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+                {3, 3, 0, 3, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 3, 3, 3, 0, 3, 3},
+                {0, 3, 0, 0, 3, 3, 3, 0, 1, 1, 1, 1, 1, 0, 0, 0, 3, 0, 3, 0},
+                {3, 3, 0, 0, 0, 0, 3, 0, 1, 1, 1, 1, 1, 0, 3, 3, 3, 0, 3, 3},
+                {0, 3, 0, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0},
+                {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+                {0, 3, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 3, 0},
+                {0, 3, 0, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 0, 3, 0},
+                {0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 3, 0},
+                {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0}
+        };
+
+        int rows = mapData.length;
+        int cols = mapData[0].length;
+
+        Map map = new Map(cols, rows,  MyGame.BLACK);
+
+        for (int y = 0; y < rows; y++) {
+            for (int x = 0; x < cols; x++) {
+                map.setPixel(x, rows - 1 - y, mapData[y][x]);
+            }
+        }
+
         MyGhost[] ghosts = new MyGhost[1];
         ghosts[0] = new MyGhost();
 
-        Index2D startPos = new Index2D(10, 10);
+        Index2D startPos = new Index2D(10, 9);
         MyGame game = new MyGame(startPos, map, ghosts);
 
         int scale = 30;
@@ -32,7 +61,6 @@ public class myMain {
         }
 
     }
-
 
     private static void drawGame(MyGame game) {
         StdDraw.clear(StdDraw.BLACK);
