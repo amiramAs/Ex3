@@ -6,6 +6,7 @@ import exe.ex3.game.GhostCL;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.awt.Font;
 
 public class myMain {
     public static void main(String[] args) {
@@ -30,6 +31,14 @@ public class myMain {
                 {0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0}
         };
 
+        int[][] mapData1 = {
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
+                {0, 3, 0, 0, 1, 1, 1, 1, 0, 0, 3, 0},
+                {0, 3, 0, 2, 0, 0, 3, 3, 2, 0, 3, 0},
+
+        };
+
         int rows = mapData.length;
         int cols = mapData[0].length;
 
@@ -41,9 +50,11 @@ public class myMain {
             }
         }
 
-        MyGhost[] ghosts = new MyGhost[1];
-        ghosts[0] = new MyGhost();
 
+        Index2D ghostStartPos= new Index2D(10,7);
+        MyGhost[] ghosts = {new MyGhost(0, ghostStartPos,1)
+        ,new MyGhost(1, ghostStartPos,0)
+        ,new MyGhost(2, ghostStartPos,0)};
         Index2D startPos = new Index2D(10, 9);
         MyGame game = new MyGame(startPos, map, ghosts);
 
@@ -53,12 +64,56 @@ public class myMain {
         StdDraw.setYscale(-0.5, rows - 0.5);
         StdDraw.enableDoubleBuffering();
 
-        while (game.getStatus()!= MyGame.DONE){
-            handleInput(game);
+        int count=0;
+
+        while (game.getStatus()== MyGame.PLAY||game.getStatus()== MyGame.INIT) {
+            if(count==10){
+                game.setGhostsStatus(1,1);
+            }
+            if(count==20){
+                game.setGhostsStatus(2,1);
+            }
+            int nextPos= handleInput(game);
+            game.move(nextPos);
             drawGame(game);
             StdDraw.show();
             StdDraw.pause(game.get_dt());
+
+            count++;
         }
+        if (game.getStatus()== MyGame.DOWN) {
+            drawWin(game);
+            StdDraw.show();
+            StdDraw.pause(game.get_dt());
+        }
+        if (game.getStatus()== MyGame.LOSS) {
+            drawLoss(game);
+            StdDraw.show();
+            StdDraw.pause(game.get_dt());
+        }
+    }
+
+    private static void drawWin(MyGame game) {
+        int[][] board = game.getGame(0);
+
+        Font font = new Font("Arial", Font.BOLD, 40);
+        StdDraw.setFont(font);
+
+        StdDraw.clear(StdDraw.BLACK);
+        StdDraw.setPenColor(StdDraw.BOOK_LIGHT_BLUE);
+        StdDraw.text((double) board.length /2, (double) board[0].length /2,"you win!!");
+
+    }
+
+    private static void drawLoss(MyGame game) {
+        int[][] board = game.getGame(0);
+
+        Font font = new Font("Arial", Font.BOLD, 40);
+        StdDraw.setFont(font);
+
+        StdDraw.clear(StdDraw.BLACK);
+        StdDraw.setPenColor(StdDraw.RED);
+        StdDraw.text((double) board.length /2, (double) board[0].length /2,"you loss😥");
 
     }
 
@@ -71,8 +126,8 @@ public class myMain {
                 int cell = board[x][y];
 
                 if (cell == MyGame.BLUE) {
-                    StdDraw.setPenColor(StdDraw.BLUE);
-                    StdDraw.filledSquare(x, y, 0.5);
+                    StdDraw.picture(x, y, "wall.png", 0.8, 0.8);
+
                 }
                 else if (cell == MyGame.PINK) {
                     StdDraw.setPenColor(StdDraw.PINK);
@@ -89,32 +144,34 @@ public class myMain {
         int dir = game.getDir();
         StdDraw.picture(pPos.getX(), pPos.getY(), "p1.png", 0.8, 0.8,dir);
 
-//        MyGhost[] ghosts = game.getGhosts(0);
-//        for (MyGhost g : ghosts) {
-//            Index2D gPos = g.getPos2D();
-//            int type = g.getType();
-//
-//            String ghostImage = "g" + type + ".png";
-//
-//            StdDraw.picture(gPos.getX(), gPos.getY(), ghostImage, 0.8, 0.8);
-//        }
+        MyGhost[] ghosts = game.getGhosts(0);
+        for (MyGhost g : ghosts) {
+            Index2D gPos = g.getPos2D();
+            int type = g.getType();
+
+            String ghostImage = "g" + type + ".png";
+
+            StdDraw.picture(gPos.getX(), gPos.getY(), ghostImage, 0.8, 0.8);
+        }
     }
 
-    private static void handleInput(MyGame game) {
+    private static int handleInput(MyGame game) {
+        int ans=0;
         if (StdDraw.isKeyPressed(KeyEvent.VK_SPACE)) {
             game.setStatus(MyGame.PLAY);
         }
         if (StdDraw.isKeyPressed(java.awt.event.KeyEvent.VK_UP)) {
-            game.move(MyGame.UP);
+            ans=MyGame.UP;
         };
         if (StdDraw.isKeyPressed(java.awt.event.KeyEvent.VK_LEFT)) {
-            game.move(MyGame.LEFT);
+            ans=MyGame.LEFT;
         };
         if (StdDraw.isKeyPressed(java.awt.event.KeyEvent.VK_DOWN)) {
-            game.move(MyGame.DOWN);
+            ans=MyGame.DOWN;
         };
         if (StdDraw.isKeyPressed(java.awt.event.KeyEvent.VK_RIGHT)) {
-            game.move(MyGame.RIGHT);
+            ans=MyGame.RIGHT;
         };
+        return ans;
     }
 }

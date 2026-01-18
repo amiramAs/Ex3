@@ -16,6 +16,7 @@ public class MyGame implements PacmanGame {
     static int PLAY = 1;
     static int PAUSE = 2;
     static int DONE = 3;
+    static int LOSS = 4;
     static int ERR = -1;
     static int STAY = 0;
     static int LEFT = 2;
@@ -67,62 +68,42 @@ public class MyGame implements PacmanGame {
     @Override
     public String move(int i) {
         String ans="";
-        Index2D nextPos = new Index2D(_pos);
         if (_status==PLAY) {
-            if (i == UP) {
-                if (_pos.getY() < _map.getHeight() - 1) {
-                    nextPos.setY(_pos.getY() + 1);
-                } else {
-                    nextPos.setY(0);
-                }
-                _dir = 90;
+            _pos = nextPos(i,_pos);
+            if(i==UP){
+                _dir=90;
             }
-            if (i == DOWN) {
-                if (_pos.getY() > 0) {
-                    nextPos.setY(_pos.getY() - 1);
-                } else {
-                    nextPos.setY(_map.getHeight() - 1);
-                }
-                _dir = 270;
+            if(i==DOWN){
+                _dir=270;
             }
-
-            if (i == RIGHT) {
-                if (_pos.getX() < _map.getWidth() - 1) {
-                    nextPos.setX(_pos.getX() + 1);
-                } else {
-                    nextPos.setX(0);
-                }
-                _dir = 0;
+            if(i==LEFT){
+                _dir=180;
             }
-
-            if (i == LEFT) {
-                if (_pos.getX() > 0) {
-                    nextPos.setX(_pos.getX() - 1);
-                } else {
-                    nextPos.setX(_map.getWidth() - 1);
-                }
-                _dir = 180;
-            }
-
-            if(_map.getPixel(nextPos) != BLUE) {
-                _pos=nextPos;
+            if(i==RIGHT){
+                _dir=0;
             }
 
             if (_map.getPixel(_pos) == PINK) {
                 _map.setPixel(_pos, BLACK);
             }
 
-//        for (int j =0;j<_ghosts.length;j++){
-//            Index2D ghostPos=posInt(_ghosts[j].getPos(i));
-//            if( ghostPos== _pos){
-//                if(_ghosts[j].getStatus() == 1){
-//                    _status=DONE;
-//                }
-//                if(_ghosts[j].getStatus() == 2){
-//                    _ghosts[j].setStatus(0);
-//                }
-//            }
-//        }
+            for (int j =0;j<_ghosts.length;j++){
+                Index2D ghostPos=posInt(_ghosts[j].getPos(i));
+                if(ghostPos.equals(_pos)){
+                    if(_ghosts[j].getStatus() == 1){
+                        _status=LOSS;
+                    }
+                    if(_ghosts[j].getStatus() == 2){
+                        _ghosts[j].setStatus(0);
+                    }
+                }
+                if(_ghosts[j].getStatus() == 1){
+                    int ghostDir = (int)(Math.random()*(5-1)) + 1;
+                    Index2D nextGhostPos = nextPos(ghostDir,_ghosts[j].getPos2D());
+                    _ghosts[j].setPos(nextGhostPos);
+                }
+
+            }
         }
 
         boolean remainPink=false;
@@ -187,5 +168,48 @@ public class MyGame implements PacmanGame {
         int x = Integer.parseInt(parts[0].trim());
         int y = Integer.parseInt(parts[1].trim());
         return new Index2D (x,y);
+    }
+
+    private Index2D nextPos(int i,Index2D pos) {
+        Index2D nextPos = new Index2D(pos);
+        if (i == UP) {
+            if (pos.getY() < _map.getHeight() - 1) {
+                nextPos.setY(pos.getY() + 1);
+            } else {
+                nextPos.setY(0);
+            }
+        }
+        if (i == DOWN) {
+            if (pos.getY() > 0) {
+                nextPos.setY(pos.getY() - 1);
+            } else {
+                nextPos.setY(_map.getHeight() - 1);
+            }
+        }
+
+        if (i == RIGHT) {
+            if (pos.getX() < _map.getWidth() - 1) {
+                nextPos.setX(pos.getX() + 1);
+            } else {
+                nextPos.setX(0);
+            }
+        }
+        if (i == LEFT) {
+            if (pos.getX() > 0) {
+                nextPos.setX(pos.getX() - 1);
+            } else {
+                nextPos.setX(_map.getWidth() - 1);
+            }
+        }
+
+        if(_map.getPixel(nextPos) == BLUE) {
+            nextPos=pos;
+        }
+
+        return nextPos;
+    }
+
+    public void setGhostsStatus(int i, int status) {
+        _ghosts[i].setStatus(status);
     }
 }
