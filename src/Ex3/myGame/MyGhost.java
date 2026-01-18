@@ -6,7 +6,7 @@ import exe.ex3.game.GhostCL;
 public class MyGhost implements GhostCL {
     private int _type;
     private long _lastGreen;
-    private long _greenTimeOut;
+    private double _greenTimeOut;
     private Index2D _pos;
     private int _status;
     private int _dir;
@@ -48,7 +48,11 @@ public class MyGhost implements GhostCL {
 
     @Override
     public double remainTimeAsEatable(int i) {
-        return 0;
+        return _greenTimeOut;
+    }
+
+    public void setGreenTime(double time) {
+        _greenTimeOut = time;
     }
 
     @Override

@@ -53,8 +53,10 @@ public class myMain {
 
         Index2D ghostStartPos= new Index2D(10,7);
         MyGhost[] ghosts = {new MyGhost(0, ghostStartPos,1)
-        ,new MyGhost(1, ghostStartPos,0)
-        ,new MyGhost(2, ghostStartPos,0)};
+                ,new MyGhost(0, ghostStartPos,0)
+                ,new MyGhost(1, ghostStartPos,0)
+                ,new MyGhost(1, ghostStartPos,0)
+                ,new MyGhost(2, ghostStartPos,0)};
         Index2D startPos = new Index2D(10, 9);
         MyGame game = new MyGame(startPos, map, ghosts);
 
@@ -73,6 +75,7 @@ public class myMain {
             if(count==20){
                 game.setGhostsStatus(2,1);
             }
+
             int nextPos= handleInput(game);
             game.move(nextPos);
             drawGame(game);
@@ -83,14 +86,13 @@ public class myMain {
         }
         if (game.getStatus()== MyGame.DOWN) {
             drawWin(game);
-            StdDraw.show();
-            StdDraw.pause(game.get_dt());
+
         }
         if (game.getStatus()== MyGame.LOSS) {
             drawLoss(game);
-            StdDraw.show();
-            StdDraw.pause(game.get_dt());
         }
+        StdDraw.show();
+        StdDraw.pause(game.get_dt());
     }
 
     private static void drawWin(MyGame game) {
@@ -148,10 +150,15 @@ public class myMain {
         for (MyGhost g : ghosts) {
             Index2D gPos = g.getPos2D();
             int type = g.getType();
+            int status = g.getStatus();
 
             String ghostImage = "g" + type + ".png";
 
-            StdDraw.picture(gPos.getX(), gPos.getY(), ghostImage, 0.8, 0.8);
+            if(status !=2){
+                StdDraw.picture(gPos.getX(), gPos.getY(), ghostImage, 0.8, 0.8);
+            }else{
+                StdDraw.picture(gPos.getX(), gPos.getY(), ghostImage, 0.5, 0.5);
+            }
         }
     }
 

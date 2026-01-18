@@ -33,7 +33,7 @@ public class MyGame implements PacmanGame {
         _map = map;
         _ghosts = ghosts;
         _status = INIT;
-        _dt = 100;
+        _dt = 80;
         _dir = 0;
     }
 
@@ -86,21 +86,43 @@ public class MyGame implements PacmanGame {
             if (_map.getPixel(_pos) == PINK) {
                 _map.setPixel(_pos, BLACK);
             }
+            if(_map.getPixel(_pos)==GREEN){
+                _map.setPixel(_pos, BLACK);
+                for (int j =0;j<_ghosts.length;j++){
+                    _ghosts[j].setStatus(2);
+                    _ghosts[j].setGreenTime(40*_dt);
+                }
+            }
 
             for (int j =0;j<_ghosts.length;j++){
                 Index2D ghostPos=posInt(_ghosts[j].getPos(i));
                 if(ghostPos.equals(_pos)){
-                    if(_ghosts[j].getStatus() == 1){
+                    if(_ghosts[j].getStatus() != 2){
                         _status=LOSS;
-                    }
-                    if(_ghosts[j].getStatus() == 2){
-                        _ghosts[j].setStatus(0);
+                    }else{
+                        _ghosts[j].setStatus(3);
+                        _ghosts[j].setGreenTime(20*_dt);
+                        _ghosts[j].setPos(new Index2D(10,7));
                     }
                 }
-                if(_ghosts[j].getStatus() == 1){
+                if(_ghosts[j].getStatus() == 1||_ghosts[j].getStatus() == 2){
                     int ghostDir = (int)(Math.random()*(5-1)) + 1;
                     Index2D nextGhostPos = nextPos(ghostDir,_ghosts[j].getPos2D());
                     _ghosts[j].setPos(nextGhostPos);
+                }
+                if (_ghosts[j].getStatus() == 2){
+                    double time = _ghosts[j].remainTimeAsEatable(0)-_dt;
+                    _ghosts[j].setGreenTime(time);
+                    if(time<=0){
+                        _ghosts[j].setStatus(1);
+                    }
+                }
+                if (_ghosts[j].getStatus() == 3){
+                    double time = _ghosts[j].remainTimeAsEatable(0)-_dt;
+                    _ghosts[j].setGreenTime(time);
+                    if(time<=0){
+                        _ghosts[j].setStatus(1);
+                    }
                 }
 
             }
