@@ -22,7 +22,7 @@ public class myMain {
                 {3, 3, 0, 3, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 3, 3, 3, 0, 3, 3},
                 {0, 3, 0, 0, 3, 3, 3, 0, 1, 1, 1, 1, 1, 0, 0, 0, 3, 0, 3, 0},
                 {3, 3, 0, 0, 0, 0, 3, 0, 1, 1, 1, 1, 1, 0, 3, 3, 3, 0, 3, 3},
-                {0, 3, 0, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0},
+                {0, 3, 0, 3, 3, 3, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0},
                 {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
                 {0, 3, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 3, 0},
                 {0, 3, 0, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 0, 3, 0},
@@ -55,8 +55,8 @@ public class myMain {
         MyGhost[] ghosts = {new MyGhost(0, ghostStartPos,1)
                 ,new MyGhost(0, ghostStartPos,0)
                 ,new MyGhost(1, ghostStartPos,0)
-                ,new MyGhost(1, ghostStartPos,0)
-                ,new MyGhost(2, ghostStartPos,0)};
+                ,new MyGhost(2, ghostStartPos,0)
+                ,new MyGhost(3, ghostStartPos,0)};
         Index2D startPos = new Index2D(10, 9);
         MyGame game = new MyGame(startPos, map, ghosts);
 
@@ -75,14 +75,27 @@ public class myMain {
             if(count==20){
                 game.setGhostsStatus(2,1);
             }
+            if(count==50){
+                game.setGhostsStatus(3,1);
+            }
+            if(count==80){
+                game.setGhostsStatus(4,1);
+            }
 
             int nextPos= handleInput(game);
             game.move(nextPos);
             drawGame(game);
+
+            if (game.getStatus()== MyGame.INIT) {
+                drawStart(game);
+            }
+            if (game.getStatus()== MyGame.PLAY) {
+                count++;
+            }
+
             StdDraw.show();
             StdDraw.pause(game.get_dt());
 
-            count++;
         }
         if (game.getStatus()== MyGame.DOWN) {
             drawWin(game);
@@ -95,22 +108,34 @@ public class myMain {
         StdDraw.pause(game.get_dt());
     }
 
+    private static void drawStart(MyGame game) {
+        int[][] board = game.getGame(0);
+
+        Font font = new Font("Calibri", Font.BOLD, 20);
+        StdDraw.setFont(font);
+
+        StdDraw.setPenColor(Color.BLACK);
+        StdDraw.filledRectangle((double) board.length /2,(double) (board[0].length /4)*3,(double) board[0].length/4,(double) board.length/12);
+        StdDraw.setPenColor(StdDraw.YELLOW);
+        StdDraw.text((double) board.length /2, (double)( board[0].length /4)*3+0.5,"Press space to start");
+        StdDraw.text((double) board.length /2, (double)( board[0].length /4)*3-0.5,"Use the arrow keys to move");
+    }
+
     private static void drawWin(MyGame game) {
         int[][] board = game.getGame(0);
 
-        Font font = new Font("Arial", Font.BOLD, 40);
+        Font font = new Font("Calibri", Font.BOLD, 40);
         StdDraw.setFont(font);
 
         StdDraw.clear(StdDraw.BLACK);
         StdDraw.setPenColor(StdDraw.BOOK_LIGHT_BLUE);
         StdDraw.text((double) board.length /2, (double) board[0].length /2,"you win!!");
-
     }
 
     private static void drawLoss(MyGame game) {
         int[][] board = game.getGame(0);
 
-        Font font = new Font("Arial", Font.BOLD, 40);
+        Font font = new Font("Calibri", Font.BOLD, 40);
         StdDraw.setFont(font);
 
         StdDraw.clear(StdDraw.BLACK);
