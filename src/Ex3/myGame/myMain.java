@@ -22,7 +22,7 @@ public class myMain {
                 {3, 3, 0, 3, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 3, 3, 3, 0, 3, 3},
                 {0, 3, 0, 0, 3, 3, 3, 0, 1, 1, 1, 1, 1, 0, 0, 0, 3, 0, 3, 0},
                 {3, 3, 0, 0, 0, 0, 3, 0, 1, 1, 1, 1, 1, 0, 3, 3, 3, 0, 3, 3},
-                {0, 3, 0, 3, 3, 3, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0},
+                {0, 3, 0, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0},
                 {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
                 {0, 3, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 3, 0},
                 {0, 3, 0, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 0, 3, 0},
@@ -49,7 +49,6 @@ public class myMain {
                 map.setPixel(x, rows - 1 - y, mapData[y][x]);
             }
         }
-
 
         Index2D ghostStartPos= new Index2D(10,7);
         MyGhost[] ghosts = {new MyGhost(0, ghostStartPos,1)
@@ -140,7 +139,7 @@ public class myMain {
 
         StdDraw.clear(StdDraw.BLACK);
         StdDraw.setPenColor(StdDraw.RED);
-        StdDraw.text((double) board.length /2, (double) board[0].length /2,"you loss😥");
+        StdDraw.text((double) board.length /2, (double) board[0].length /2,"you loss :(");
 
     }
 

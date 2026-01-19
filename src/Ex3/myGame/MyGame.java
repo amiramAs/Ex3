@@ -17,8 +17,7 @@ public class MyGame implements PacmanGame {
     static int PAUSE = 2;
     static int DONE = 3;
     static int LOSS = 4;
-    static int ERR = -1;
-    static int STAY = 0;
+
     static int LEFT = 2;
     static int RIGHT = 4;
     static int UP = 1;
@@ -124,7 +123,6 @@ public class MyGame implements PacmanGame {
                         _ghosts[j].setStatus(1);
                     }
                 }
-
             }
         }
 
