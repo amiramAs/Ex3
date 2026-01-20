@@ -2,7 +2,6 @@ package Ex3.myGame;
 
 import Ex3.Index2D;
 import Ex3.Map;
-import exe.ex3.game.GhostCL;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
@@ -99,6 +98,10 @@ public class myMain {
         StdDraw.pause(game.get_dt());
     }
 
+    /**
+     * The function receives a game in its initial configuration and show the game with instructions.
+     * @param game game object
+     */
     private static void drawStart(MyGame game) {
         int[][] board = game.getGame(0);
 
@@ -112,6 +115,10 @@ public class myMain {
         StdDraw.text((double) board.length /2, (double)( board[0].length /4)*3-0.5,"Use the arrow keys to move");
     }
 
+    /**
+     * The function receives a game and show win screen.
+     * @param game game object
+     */
     private static void drawWin(MyGame game) {
         int[][] board = game.getGame(0);
 
@@ -123,6 +130,10 @@ public class myMain {
         StdDraw.text((double) board.length /2, (double) board[0].length /2,"you win!!");
     }
 
+    /**
+     * The function receives a game and show GAME OVER screen.
+     * @param game game object
+     */
     private static void drawLoss(MyGame game) {
         int[][] board = game.getGame(0);
 
@@ -135,6 +146,10 @@ public class myMain {
 
     }
 
+    /**
+     * The function receives a map of the game and prints the state according to what is in each pixel.
+     * @param game game object
+     */
     private static void drawGame(MyGame game) {
         StdDraw.clear(StdDraw.BLACK);
         int[][] board = game.getGame(0);
@@ -178,6 +193,11 @@ public class myMain {
         }
     }
 
+    /**
+     * The function matches keyboard input with the corresponding movement.
+     * @param game game object
+     * @return Direction of movement
+     */
     private static int handleInput(MyGame game) {
         int ans=0;
         if (StdDraw.isKeyPressed(KeyEvent.VK_SPACE)) {
@@ -185,16 +205,16 @@ public class myMain {
         }
         if (StdDraw.isKeyPressed(java.awt.event.KeyEvent.VK_UP)) {
             ans=MyGame.UP;
-        };
+        }
         if (StdDraw.isKeyPressed(java.awt.event.KeyEvent.VK_LEFT)) {
             ans=MyGame.LEFT;
-        };
+        }
         if (StdDraw.isKeyPressed(java.awt.event.KeyEvent.VK_DOWN)) {
             ans=MyGame.DOWN;
-        };
+        }
         if (StdDraw.isKeyPressed(java.awt.event.KeyEvent.VK_RIGHT)) {
             ans=MyGame.RIGHT;
-        };
+        }
         return ans;
     }
 }

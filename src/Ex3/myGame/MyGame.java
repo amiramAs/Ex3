@@ -36,34 +36,70 @@ public class MyGame implements PacmanGame {
         _dir = 0;
     }
 
+    /**
+     * Returns the character representation of the key associated with this action.
+     * @return The character of the key, or null if no specific key is assigned.
+     */
     @Override
     public Character getKeyChar() {
         return null;
     }
 
+    /**
+     * Returns a string representation of the current position.
+     * @param i The index or time step (currently not used in implementation).
+     * @return A string describing the position.
+     */
     @Override
     public String getPos(int i) {
         return _pos.toString();
     }
 
+    /**
+     * Retrieves the current position as a 2D index object.
+     * @param i The index or time step (currently not used in implementation).
+     * @return An Index2D object representing the 2D coordinates.
+     */
     public Index2D getPos2D(int i) {
         return _pos;
     }
 
+    /**
+     * Gets the current direction of the entity.
+     * @return An integer representing the direction (e.g., 0: Up, 1: Right, etc.).
+     */
     public int getDir() {
         return this._dir;
     }
 
+    /**
+     * Returns an array containing all the ghost entities in the game.
+     * @param i The index or time step (currently not used in implementation).
+     * @return An array of MyGhost objects.
+     */
     @Override
     public MyGhost[] getGhosts(int i) {
         return _ghosts;
     }
 
+    /**
+     * Retrieves the game board/map as a 2D integer array.
+     * Each value in the array typically represents a type of tile (wall, path, etc.).
+     * @param i The index or time step (currently not used in implementation).
+     * @return A 2D int array representing the map layout.
+     */
     @Override
     public int[][] getGame(int i) {
         return _map.getMap();
     }
 
+    /**
+     * The function implements the game server at each step.
+     * It receives a number representing a direction of movement,
+     * moves the Pacman if possible, eats pink dots if there are any, and ends the game if the Pacman hits a ghost.
+     * @param i dir from client
+     * @return null string
+     */
     @Override
     public String move(int i) {
         String ans="";
@@ -94,7 +130,7 @@ public class MyGame implements PacmanGame {
             }
 
             for (int j =0;j<_ghosts.length;j++){
-                Index2D ghostPos=posInt(_ghosts[j].getPos(i));
+                Index2D ghostPos= pos2D(_ghosts[j].getPos(i));
                 if(ghostPos.equals(_pos)){
                     if(_ghosts[j].getStatus() != 2){
                         _status=LOSS;
@@ -158,19 +194,37 @@ public class MyGame implements PacmanGame {
         return "";
     }
 
+    /**
+     * Retrieves the current status of the game or entity.
+     * * @return An integer representing the current state (e.g., Running, Paused, or Game Over).
+     */
     @Override
     public int getStatus() {
         return _status;
     }
 
+    /**
+     * Updates the current status of the game or entity.
+     * * @param status The new status code to be set.
+     */
     public void setStatus(int status) {
         _status = status;
     }
 
+    /**
+     * Gets the "Delta Time" (dt) value used for game logic and physics updates.
+     * This usually represents the time interval between frames or steps.
+     * * @return The current delta time value.
+     */
     public int get_dt(){
         return _dt;
     }
 
+    /**
+     * Checks whether the game map is cyclic (wraps around).
+     * A cyclic map allows entities to move off one edge and reappear on the opposite side.
+     * * @return true if the map boundaries are cyclic, false otherwise.
+     */
     @Override
     public boolean isCyclic() {
         return _map.isCyclic();
@@ -181,7 +235,12 @@ public class MyGame implements PacmanGame {
         return "";
     }
 
-    private static Index2D posInt(String pos) {
+    /**
+     * Function converts position from string to object Index2D
+     * @param pos String of position
+     * @return Index2D of position
+     */
+    private static Index2D pos2D(String pos) {
         String[] parts = pos.replace("(", "")
                 .replace(")", "")
                 .split(",");
@@ -190,7 +249,14 @@ public class MyGame implements PacmanGame {
         return new Index2D (x,y);
     }
 
-    private Index2D nextPos(int i,Index2D pos) {
+    /**
+     * The function receives the direction and current position of the Pacman,
+     * checks based on the direction whether the next step is possible (walls, map symmetries) and returns a pixel of the next step.
+     * @param i Step direction
+     * @param pos Pacman's position
+     * @return Index2D of the next step
+     */
+    private Index2D nextPos(int i, Index2D pos) {
         Index2D nextPos = new Index2D(pos);
         if (i == UP) {
             if (pos.getY() < _map.getHeight() - 1) {
@@ -229,6 +295,12 @@ public class MyGame implements PacmanGame {
         return nextPos;
     }
 
+    /**
+     * Updates the status of a specific ghost in the game.
+     * @param i The index of the ghost within the ghosts array.
+     * @param status The new status value to be assigned to the specified ghost.
+     * @throws ArrayIndexOutOfBoundsException if the index i is out of range.
+     */
     public void setGhostsStatus(int i, int status) {
         _ghosts[i].setStatus(status);
     }
