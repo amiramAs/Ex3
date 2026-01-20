@@ -31,14 +31,6 @@ public class myMain {
                 {0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0}
         };
 
-        int[][] mapData1 = {
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 0},
-                {0, 3, 0, 0, 1, 1, 1, 1, 0, 0, 3, 0},
-                {0, 3, 0, 2, 0, 0, 3, 3, 2, 0, 3, 0},
-
-        };
-
         int rows = mapData.length;
         int cols = mapData[0].length;
 
@@ -139,7 +131,7 @@ public class myMain {
 
         StdDraw.clear(StdDraw.BLACK);
         StdDraw.setPenColor(StdDraw.RED);
-        StdDraw.text((double) board.length /2, (double) board[0].length /2,"you loss :(");
+        StdDraw.text((double) board.length /2, (double) board[0].length /2,"GAME OVER! :(");
 
     }
 

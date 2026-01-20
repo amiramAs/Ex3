@@ -6,13 +6,11 @@ import exe.ex3.game.PacManAlgo;
 import exe.ex3.game.PacmanGame;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 /**
- * This is the major algorithmic class for Ex3 - the PacMan game:
+ * This is the major algorithmic class for Ex3 - the PacMan game
  *
- * This code is a very simple example (random-walk algorithm).
- * Your task is to implement (here) your PacMan algorithm.
+ *
  */
 public class Ex3Algo implements PacManAlgo{
 	private int _count;
@@ -25,11 +23,16 @@ public class Ex3Algo implements PacManAlgo{
 	 *  Add a short description for the algorithm as a String.
 	 */
 	public String getInfo() {
-		return null;
+		return "The algorithm looks for the distance from Pac-Man to a ghost, if it is close it marks the locations of the monsters as a wall and goes pink the further away from the ghosts.";
 	}
+
 	@Override
 	/**
-	 * This ia the main method - that you should design, implement and test.
+	 * This ia the main method - The function checks each round of the game (DT) what the state of the board is and accordingly moves to the appropriate state.
+     * There is a food search mode and a ghost escape mode.
+     *
+     * @param game Pacman Game object that gives the current state of the game with all its objects.
+     * @return dir number representing the direction of the next move.
 	 */
 	public int move(PacmanGame game) {
         int state=1;
@@ -41,13 +44,13 @@ public class Ex3Algo implements PacManAlgo{
         int black = Game.getIntColor(Color.BLACK, code);
         int green = Game.getIntColor(Color.GREEN, code);
         String pos = game.getPos(code).toString();
-        Index2D pos2D= posInt(pos);
+        Index2D pos2D= pos2D(pos);
         GhostCL[] ghosts = game.getGhosts(code);
 
         if(_count==0 || _count==300) {
-            printBoard(board);
 			System.out.println("Blue=" + blue + ", Pink=" + pink + ", Black=" + black + ", Green=" + green);
 			System.out.println("Pacman coordinate: "+pos);
+            printBoard(board);
 			printGhosts(ghosts);
 		}
 
@@ -69,6 +72,14 @@ public class Ex3Algo implements PacManAlgo{
 		return dir;
 	}
 
+    /**
+     * This function finds the closest square with a given color
+     * @param map Map2D object of the game
+     * @param pos Index2D object position of PakMan
+     * @param color Number of the desired color
+     * @param colorAbs Number of the Wall color
+     * @return path to the point
+     */
     private static Pixel2D[] closestColor(Map map, Index2D pos,int color, int colorAbs){
         Pixel2D[] ans=null;
 
@@ -78,6 +89,11 @@ public class Ex3Algo implements PacManAlgo{
         return ans;
     }
 
+    /**
+     * The function receives a movement path and goes to the next step in the path.
+     * @param path Pixel2D array, A desired path for Pacman to follow
+     * @return int Walking direction for current step
+     */
     private int goPath(Pixel2D[] path){
         int ans=0;
 
@@ -104,13 +120,23 @@ public class Ex3Algo implements PacManAlgo{
         return ans;
     }
 
+    /**
+     * The function checks where the closest ghost is.
+     * If it is less than 6 steps the state changes to 2.
+     * If the ghost is close but I have enough time to eat the state will be 3.
+     * @param map Map2D object of the game
+     * @param ghosts GhostCL array of ghosts at the game
+     * @param pos Index2D object position of PakMan
+     * @param colorAbs Number of the Wall color
+     * @return number of the state
+     */
     private int findState(Map map,GhostCL[] ghosts,Index2D pos, int colorAbs){
         int ans = 1;
 
         Map2D allDis = map.allDistance(pos,colorAbs);
 
         for (int i=0; i<ghosts.length; i++){
-            Index2D ghostPos = posInt(ghosts[i].getPos(0));
+            Index2D ghostPos = pos2D(ghosts[i].getPos(0));
             int dis = allDis.getPixel(ghostPos);
 
             if(ghosts[i].getStatus()==1 && dis<6 && ghosts[i].remainTimeAsEatable(0)<1.6) {
@@ -124,45 +150,42 @@ public class Ex3Algo implements PacManAlgo{
         return ans;
     }
 
-    private Pixel2D[] eatGhost(Map map,GhostCL[] ghosts,Index2D pos, int colorAbs){
-        Pixel2D[] ans=null;
-        Map2D allDis = map.allDistance(pos,colorAbs);
 
-        Index2D nearPos = null;
-        int nearDis=15;
-
-        for (int i=0; i<ghosts.length; i++) {
-            Index2D ghostPos = posInt(ghosts[i].getPos(0));
-            int dis = allDis.getPixel(ghostPos);
-
-            if (ghosts[i].getStatus() == 1 && dis!=-1 && dis < nearDis ) {
-                nearDis = dis;
-                nearPos = ghostPos;
-            }
-        }
-
-        ans = map.shortestPath(pos, nearPos, colorAbs);
-
-        return ans;
-    }
-
+    /**
+     * The function turns the ghosts into walls and looks for a pink spot that Pacman can escape to.
+     * If there is no such spot, the function looks for an empty spot that Pacman can go to in the same step.
+     * @param map Map2D object of the game
+     * @param ghosts GhostCL array of ghosts at the game
+     * @param pos Index2D object position of PakMan
+     * @param color Number of the desired color
+     * @param colorAbs Number of the Wall color
+     * @return path to the point
+     */
     private Pixel2D[] runWay(Map map,GhostCL[] ghosts,Index2D pos,int color, int colorAbs){
         Pixel2D[] ans = null;
 
         for (int i=0; i<ghosts.length; i++) {
-            Index2D ghostPos = posInt(ghosts[i].getPos(0));
+            Index2D ghostPos = pos2D(ghosts[i].getPos(0));
             map.setPixel(ghostPos, colorAbs);
         }
 
         ans = closestColor(map,pos,color,colorAbs);
 
         if(ans==null){
-            ans =getEmergencyMove(map, pos, colorAbs);
+            ans = getEmergencyMove(map, pos, colorAbs);
         }
 
         return ans;
     }
 
+    /**
+     * The function goes through all the points close to Pacman and checks if there is a wall there.
+     * if the point is free, it returns a path with the point.
+     * @param map Map2D object of the game
+     * @param pos Index2D object position of PakMan
+     * @param colorAbs Number of the Wall color
+     * @return path to the point
+     */
     private Pixel2D[] getEmergencyMove(Map map, Index2D pos, int colorAbs) {
         Pixel2D[] ans =null;
         int x = pos.getX();
@@ -205,13 +228,12 @@ public class Ex3Algo implements PacManAlgo{
 		}
 	}
 
-	private static int randomDir() {
-		int[] dirs = {Game.UP, Game.LEFT, Game.DOWN, Game.RIGHT};
-		int ind = (int)(Math.random()*dirs.length);
-		return dirs[ind];
-	}
-
-    private static Index2D posInt(String pos) {
+    /**
+     * Function converts position from string to object Index2D
+     * @param pos String of position
+     * @return Index2D of position
+     */
+    private static Index2D pos2D(String pos) {
         String[] parts = pos.replace("(", "")
                 .replace(")", "")
                 .split(",");
@@ -220,6 +242,14 @@ public class Ex3Algo implements PacManAlgo{
         return new Index2D (x,y);
     }
 
+    /**
+     * The function finds a point of a certain color that is closest of that color to the Pacman's position.
+     *  @param map Map2D object of the game
+     *  @param pos Index2D object position of PakMan
+     *  @param color Number of the desired color
+     *  @param colorAbs Number of the Wall color
+     * @return pixel of point
+     */
     private static Index2D pixelOfColor(Map map , int color, int colorAbs, Index2D pos) {
         Index2D ans=null;
 
@@ -239,7 +269,6 @@ public class Ex3Algo implements PacManAlgo{
                 }
             }
         }
-
         return ans;
     }
 }
