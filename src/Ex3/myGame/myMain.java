@@ -33,7 +33,7 @@ public class myMain {
         int rows = mapData.length;
         int cols = mapData[0].length;
 
-        Map map = new Map(cols, rows,  MyGame.BLACK);
+        Map map = new Map(cols, rows, MyGame.BLACK);
 
         for (int y = 0; y < rows; y++) {
             for (int x = 0; x < cols; x++) {

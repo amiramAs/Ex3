@@ -13,7 +13,7 @@ class MyGameTest {
     @BeforeEach
     void setUp() {
         map = new Map(5, 5, 1);
-        map.setPixel(1, 1, 0); // 0 זה BLUE/Wall
+        map.setPixel(1, 1, 0);
 
         Index2D pacmanPos = new Index2D(2, 2);
         MyGhost[] ghosts = { new MyGhost(0, new Index2D(0,0), 1) };

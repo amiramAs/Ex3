@@ -102,81 +102,98 @@ public class MyGame implements PacmanGame {
      */
     @Override
     public String move(int i) {
-        String ans="";
-        if (_status==PLAY) {
-            _pos = nextPos(i,_pos);
-            if(i==UP){
-                _dir=90;
-            }
-            if(i==DOWN){
-                _dir=270;
-            }
-            if(i==LEFT){
-                _dir=180;
-            }
-            if(i==RIGHT){
-                _dir=0;
-            }
+        String ans = "";
+        if (_status == PLAY) {
+            // 1. עדכון מיקום וכיוון השחקן
+            updatePlayerState(i);
 
-            if (_map.getPixel(_pos) == PINK) {
-                _map.setPixel(_pos, BLACK);
-            }
-            if(_map.getPixel(_pos)==GREEN){
-                _map.setPixel(_pos, BLACK);
-                for (int j =0;j<_ghosts.length;j++){
-                    _ghosts[j].setStatus(2);
-                    _ghosts[j].setGreenTime(40*_dt);
-                }
-            }
+            // 2. טיפול באינטראקציה עם המפה (נקודות/בונוסים)
+            handleMapPixels();
 
-            for (int j =0;j<_ghosts.length;j++){
-                Index2D ghostPos= pos2D(_ghosts[j].getPos(i));
-                if(ghostPos.equals(_pos)){
-                    if(_ghosts[j].getStatus() != 2){
-                        _status=LOSS;
-                    }else{
-                        _ghosts[j].setStatus(3);
-                        _ghosts[j].setGreenTime(20*_dt);
-                        _ghosts[j].setPos(new Index2D(10,7));
-                    }
-                }
-                if(_ghosts[j].getStatus() == 1||_ghosts[j].getStatus() == 2){
-                    int ghostDir = (int)(Math.random()*(5-1)) + 1;
-                    Index2D nextGhostPos = nextPos(ghostDir,_ghosts[j].getPos2D());
-                    _ghosts[j].setPos(nextGhostPos);
-                }
-                if (_ghosts[j].getStatus() == 2){
-                    double time = _ghosts[j].remainTimeAsEatable(0)-_dt;
-                    _ghosts[j].setGreenTime(time);
-                    if(time<=0){
-                        _ghosts[j].setStatus(1);
-                    }
-                }
-                if (_ghosts[j].getStatus() == 3){
-                    double time = _ghosts[j].remainTimeAsEatable(0)-_dt;
-                    _ghosts[j].setGreenTime(time);
-                    if(time<=0){
-                        _ghosts[j].setStatus(1);
-                    }
-                }
-            }
+            // 3. עדכון רוחות (תנועה, התנגשויות וזמנים)
+            updateGhostsLogic(i);
+
+            // 4. בדיקה אם המשחק נגמר (ניצחון)
+            checkVictoryCondition();
         }
-
-        boolean remainPink=false;
-        int[][] board=_map.getMap();
-        for(int x=0;x<board.length;x++){
-            for(int y=0;y<board[x].length;y++){
-                if(board[x][y]==PINK){
-                    remainPink=true;
-                }
-            }
-        }
-
-        if(!remainPink){
-            _status=DONE;
-        }
-
         return ans;
+    }
+
+    private void updatePlayerState(int i) {
+        _pos = nextPos(i, _pos);
+        if (i == UP) {
+            _dir = 90;
+        }
+        if (i == DOWN) {
+            _dir = 270;
+        }
+        if (i == LEFT) {
+            _dir = 180;
+        }
+        if (i == RIGHT) {
+            _dir = 0;
+        }
+    }
+
+    private void handleMapPixels() {
+        if (_map.getPixel(_pos) == PINK) {
+            _map.setPixel(_pos, BLACK);
+        }
+        if (_map.getPixel(_pos) == GREEN) {
+            _map.setPixel(_pos, BLACK);
+            for (int j = 0; j < _ghosts.length; j++) {
+                _ghosts[j].setStatus(2);
+                _ghosts[j].setGreenTime(40 * _dt);
+            }
+        }
+    }
+
+    private void updateGhostsLogic(int i) {
+        for (int j = 0; j < _ghosts.length; j++) {
+            // בדיקת התנגשות
+            Index2D ghostPos = pos2D(_ghosts[j].getPos(i));
+            if (ghostPos.equals(_pos)) {
+                if (_ghosts[j].getStatus() != 2) {
+                    _status = LOSS;
+                } else {
+                    _ghosts[j].setStatus(3);
+                    _ghosts[j].setGreenTime(20 * _dt);
+                    _ghosts[j].setPos(new Index2D(10, 7));
+                }
+            }
+
+            // תנועה אקראית
+            if (_ghosts[j].getStatus() == 1 || _ghosts[j].getStatus() == 2) {
+                int ghostDir = (int) (Math.random() * (5 - 1)) + 1;
+                Index2D nextGhostPos = nextPos(ghostDir, _ghosts[j].getPos2D());
+                _ghosts[j].setPos(nextGhostPos);
+            }
+
+            // עדכון טיימרים
+            if (_ghosts[j].getStatus() == 2 || _ghosts[j].getStatus() == 3) {
+                double time = _ghosts[j].remainTimeAsEatable(0) - _dt;
+                _ghosts[j].setGreenTime(time);
+                if (time <= 0) {
+                    _ghosts[j].setStatus(1);
+                }
+            }
+        }
+    }
+
+    private void checkVictoryCondition() {
+        boolean remainPink = false;
+        int[][] board = _map.getMap();
+        for (int x = 0; x < board.length; x++) {
+            for (int y = 0; y < board[x].length; y++) {
+                if (board[x][y] == PINK) {
+                    remainPink = true;
+                }
+            }
+        }
+
+        if (!remainPink) {
+            _status = DONE;
+        }
     }
 
     @Override

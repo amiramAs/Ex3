@@ -84,6 +84,10 @@ public class Ex3Algo implements PacManAlgo{
         Pixel2D[] ans=null;
 
         Index2D target = pixelOfColor(map,color,colorAbs,pos);
+        if(target==null) {
+            target=new Index2D(1,1);
+        }
+
         ans =map.shortestPath(pos,target,colorAbs);
 
         return ans;
@@ -139,11 +143,11 @@ public class Ex3Algo implements PacManAlgo{
             Index2D ghostPos = pos2D(ghosts[i].getPos(0));
             int dis = allDis.getPixel(ghostPos);
 
-            if(ghosts[i].getStatus()==1 && dis<6 && ghosts[i].remainTimeAsEatable(0)<1.6) {
+            if(ghosts[i].getStatus()==1 && dis<8 && ghosts[i].remainTimeAsEatable(0)<1.4) {
                 ans=2;
             }
 
-            if(ghosts[i].getStatus()==1 && dis<6  && ghosts[i].remainTimeAsEatable(0)>1.6){
+            if(ghosts[i].getStatus()==1 && dis<8  && ghosts[i].remainTimeAsEatable(0)>1.4){
                 ans=3;
             }
         }
