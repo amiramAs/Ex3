@@ -104,7 +104,7 @@ public class MyGame implements PacmanGame {
     public String move(int i) {
         String ans = "";
         if (_status == PLAY) {
-            updatePlayerState(i);
+            updatePlayer(i);
 
             handleMapPixels();
 
@@ -115,7 +115,13 @@ public class MyGame implements PacmanGame {
         return ans;
     }
 
-    private void updatePlayerState(int i) {
+    /**
+     * Updates the player's position and direction.
+     * Calculates the next position based on the input and sets the rotation angle
+     * to match the movement direction.
+     * @param i The direction constant
+     */
+    private void updatePlayer(int i) {
         _pos = nextPos(i, _pos);
         if (i == UP) {
             _dir = 90;
@@ -131,6 +137,11 @@ public class MyGame implements PacmanGame {
         }
     }
 
+    /**
+     * Processes the interaction between the player and the map tiles.
+     * Consumes pink dots (points) or green power-ups, which change the ghosts'
+     * status to "eatable" for a limited duration.
+     */
     private void handleMapPixels() {
         if (_map.getPixel(_pos) == PINK) {
             _map.setPixel(_pos, BLACK);
@@ -144,9 +155,14 @@ public class MyGame implements PacmanGame {
         }
     }
 
+    /**
+     * Manages ghost behavior, including movement, collisions, and vulnerability timers.
+     * Handles random movement, checks if a ghost is eaten by Pacman or kills him,
+     * and decrements the remaining "eatable" time.
+     * @param i The game index.
+     */
     private void updateGhostsLogic(int i) {
         for (int j = 0; j < _ghosts.length; j++) {
-            // בדיקת התנגשות
             Index2D ghostPos = pos2D(_ghosts[j].getPos(i));
             if (ghostPos.equals(_pos)) {
                 if (_ghosts[j].getStatus() != 2) {
@@ -158,14 +174,12 @@ public class MyGame implements PacmanGame {
                 }
             }
 
-            // תנועה אקראית
             if (_ghosts[j].getStatus() == 1 || _ghosts[j].getStatus() == 2) {
                 int ghostDir = (int) (Math.random() * (5 - 1)) + 1;
                 Index2D nextGhostPos = nextPos(ghostDir, _ghosts[j].getPos2D());
                 _ghosts[j].setPos(nextGhostPos);
             }
 
-            // עדכון טיימרים
             if (_ghosts[j].getStatus() == 2 || _ghosts[j].getStatus() == 3) {
                 double time = _ghosts[j].remainTimeAsEatable(0) - _dt;
                 _ghosts[j].setGreenTime(time);
@@ -176,12 +190,15 @@ public class MyGame implements PacmanGame {
         }
     }
 
+    /**
+     * Scans the map to determine if the victory condition is met.
+     * If no pink dots remain on the map, the game status is updated to DONE.
+     */
     private void checkVictoryCondition() {
         boolean remainPink = false;
-        int[][] board = _map.getMap();
-        for (int x = 0; x < board.length; x++) {
-            for (int y = 0; y < board[x].length; y++) {
-                if (board[x][y] == PINK) {
+        for (int x = 0; x < _map.getWidth(); x++) {
+            for (int y = 0; y < _map.getHeight(); y++) {
+                if (_map.getPixel(x,y) == PINK) {
                     remainPink = true;
                 }
             }

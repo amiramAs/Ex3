@@ -87,8 +87,14 @@ public class Map implements Map2D {
         }
     }
 
-	@Override
-	public int[][] getMap() {
+    /**
+     * Returns a deep copy of the game map.
+     * Validates that the map is initialized before copying each pixel into a new 2D array.
+     * @return A 2D integer array representing the map.
+     * @throws RuntimeException if the map is not initialized.
+     */
+    @Override
+    public int[][] getMap() {
         if (_map == null) throw new RuntimeException("Map is not initialized");
         int[][] ans = null;
         int w = getWidth(), h = getHeight();
@@ -99,48 +105,92 @@ public class Map implements Map2D {
             }
         }
         return ans;
-	}
-	@Override
-	/////// add your code below ///////
-	public int getWidth() {return _map.length;}
-	@Override
-	/////// add your code below ///////
-	public int getHeight() {
+    }
+
+    /**
+     * Returns the width (number of columns) of the map.
+     * @return The length of the first dimension of the map array.
+     */
+    @Override
+    public int getWidth() {
+        return _map.length;
+    }
+
+    /**
+     * Returns the height (number of rows) of the map.
+     * Validates that the map has at least one column before accessing its height.
+     * @return The length of the second dimension of the map array.
+     * @throws RuntimeException if the map width is 0.
+     */
+    @Override
+    public int getHeight() {
         if (_map.length == 0) {
             throw new RuntimeException("Map width 0");
         }
         return _map[0].length;
     }
-	@Override
-	/////// add your code below ///////
-	public int getPixel(int x, int y) {
+
+    /**
+     * Retrieves the integer value (color/type) of a pixel at specific coordinates.
+     * @param x The x-coordinate.
+     * @param y The y-coordinate.
+     * @return The value at the given (x, y) position.
+     */
+    @Override
+    public int getPixel(int x, int y) {
         return _map[x][y];
     }
-	@Override
-	/////// add your code below ///////
-	public int getPixel(Pixel2D p) {
-		return this.getPixel(p.getX(),p.getY());
-	}
-	@Override
-	/////// add your code below ///////
-	public void setPixel(int x, int y, int v) {_map[x][y] = v;}
-	@Override
-	/////// add your code below ///////
-	public void setPixel(Pixel2D p, int v) {
-		this.setPixel(p.getX(),p.getY(),v);
-	}
-	@Override
-	/** 
-	 * Fills this map with the new color (new_v) starting from p.
-	 * https://en.wikipedia.org/wiki/Flood_fill
-	 */
-	public int fill(Pixel2D xy, int new_v) {
-        if(!isInside(xy) ){ throw new RuntimeException("The point is not in map");}
 
-        int ans=0;
+    /**
+     * Retrieves the integer value of a pixel using a Pixel2D location object.
+     * @param p The Pixel2D object containing coordinates.
+     * @return The value at the pixel's position.
+     */
+    @Override
+    public int getPixel(Pixel2D p) {
+        return this.getPixel(p.getX(), p.getY());
+    }
 
+    /**
+     * Sets the value of a specific pixel at the given coordinates.
+     * @param x The x-coordinate.
+     * @param y The y-coordinate.
+     * @param v The new value to set.
+     */
+    @Override
+    public void setPixel(int x, int y, int v) {
+        _map[x][y] = v;
+    }
+
+    /**
+     * Sets the value of a specific pixel using a Pixel2D location object.
+     * @param p The Pixel2D object containing coordinates.
+     * @param v The new value to set.
+     */
+    @Override
+    public void setPixel(Pixel2D p, int v) {
+        this.setPixel(p.getX(), p.getY(), v);
+    }
+
+    /**
+     * Fills a connected area of pixels with a new value (Flood Fill algorithm).
+     * This function uses a Breadth-First Search (BFS) approach starting from the given coordinates.
+     * It identifies the original color at the starting point and traverses all adjacent pixels
+     * (Up, Down, Left, Right) that share this color, replacing them with new_v.
+     * A 2D boolean array ('visited') and a queue are used to manage the traversal and prevent
+     * infinite loops or redundant processing.
+     * * @param xy The starting Pixel2D coordinates.
+     * @param new_v The new value/color to apply to the area.
+     * @return The total count of pixels that were successfully repainted.
+     * @throws RuntimeException if the starting point is out of the map boundaries.
+     */
+    @Override
+    public int fill(Pixel2D xy, int new_v) {
+        if (!isInside(xy)) { throw new RuntimeException("The point is not in map"); }
+
+        int ans = 0;
         int old_v = getPixel(xy);
-        if(this.isInside(xy) && old_v != new_v){
+        if (this.isInside(xy) && old_v != new_v) {
             int w = getWidth();
             int h = getHeight();
 
@@ -149,141 +199,172 @@ public class Map implements Map2D {
             q.add(new Index2D(xy));
             visited[xy.getX()][xy.getY()] = true;
 
-            while (!q.isEmpty()){
+            while (!q.isEmpty()) {
                 Pixel2D p = q.removeFirst();
 
-                setPixel(p,new_v);
+                setPixel(p, new_v);
                 ans++;
-                visited[p.getX()][p.getY()] = true;
 
                 Pixel2D[] directions = directions(p);
-                for(Pixel2D d : directions){
-                    if (!visited[d.getX()][d.getY()] && getPixel(d)==old_v){
+                for (Pixel2D d : directions) {
+                    if (!visited[d.getX()][d.getY()] && getPixel(d) == old_v) {
+                        visited[d.getX()][d.getY()] = true;
                         q.addLast(d);
                     }
                 }
             }
         }
-		return ans;
-	}
+        return ans;
+    }
 
-	@Override
-	/**
-	 * BFS like shortest the computation based on iterative raster implementation of BFS, see:
-	 * https://en.wikipedia.org/wiki/Breadth-first_search
-	 */
-	public Pixel2D[] shortestPath(Pixel2D p1, Pixel2D p2, int obsColor) {
-		Pixel2D[] ans = null;
-        if(!isInside(p1) || !isInside(p2)){ throw new RuntimeException("One of points is not ia map");}
-        Map2D dis = allDistance(p1,obsColor);
-        if(dis.getPixel(p2)!=-1) {
+
+
+    /**
+     * Calculates the shortest path between two points while avoiding specified obstacles.
+     * The function first generates a distance map using the allDistance() BFS method.
+     * If the destination (p2) is reachable, it performs a "backtracking" procedure:
+     * starting from p2, it repeatedly identifies a neighboring pixel whose distance value
+     * is exactly 1 less than the current pixel's distance, moving backward until it reaches p1.
+     * * @param p1 The source Pixel2D.
+     * @param p2 The destination Pixel2D.
+     * @param obsColor The value representing an impassable obstacle (wall).
+     * @return An ordered array of Pixel2D objects from p1 to p2, or null if no path exists.
+     * @throws RuntimeException if p1 or p2 are outside map boundaries.
+     */
+    @Override
+    public Pixel2D[] shortestPath(Pixel2D p1, Pixel2D p2, int obsColor) {
+        Pixel2D[] ans = null;
+        if (!isInside(p1) || !isInside(p2)) { throw new RuntimeException("One of points is not in map"); }
+
+        // Step 1: Generate distance map from source p1
+        Map2D dis = allDistance(p1, obsColor);
+
+        // Step 2: If p2 was reached in the distance map, backtrack to find the path
+        if (dis.getPixel(p2) != -1) {
             Pixel2D temp = p2;
             ArrayDeque<Pixel2D> path = new ArrayDeque<>();
             path.addLast(p2);
+
             while (!temp.equals(p1)) {
                 Pixel2D[] directions = directions(temp);
                 for (Pixel2D d : directions) {
+                    // Find a neighbor that is one step closer to the source
                     if (dis.getPixel(d) < dis.getPixel(temp) && dis.getPixel(d) != -1) {
                         path.addFirst(d);
                         temp = d;
+                        break;
                     }
                 }
             }
             ans = path.toArray(Pixel2D[]::new);
         }
-
-		return ans;
-	}
-	@Override
-	/////// add your code below ///////
-	public boolean isInside(Pixel2D p) {
-        boolean ans = false;
-        int x = p.getX();
-        int y = p.getY();
-        if(x>=0 && x<getWidth() && y>=0 && y<getHeight()) {
-            ans = true;
-        }
         return ans;
-	}
+    }
 
-	@Override
-	/////// add your code below ///////
-	public boolean isCyclic() {
-		return _cyclicFlag;
-	}
-	@Override
-	/////// add your code below ///////
-	public void setCyclic(boolean cy) {_cyclicFlag = cy;}
-	@Override
-	/////// add your code below ///////
-	public Map2D allDistance(Pixel2D start, int obsColor) {
-		Map2D ans = null;
-        if(!isInside(start) ){ throw new RuntimeException("The point is not ia map");}
 
-        if(isInside(start)){
-            ans = new Map(getWidth(),getHeight(), -1);
-            ans.setCyclic(isCyclic());
-            ans.setPixel(start,0);
 
-            if (getPixel(start) != obsColor) {
-                ArrayDeque<Pixel2D> q = new ArrayDeque<>();
-                q.add(new Index2D(start));
-                while (!q.isEmpty()) {
-                    Pixel2D p = q.removeFirst();
+    /**
+     * Checks if a given pixel is within the legal bounds of the map.
+     * @param p The Pixel2D to validate.
+     * @return true if the pixel's X and Y coordinates are within [0, width) and [0, height).
+     */
+    @Override
+    public boolean isInside(Pixel2D p) {
+        int x = p.getX(), y = p.getY();
+        return (x >= 0 && x < getWidth() && y >= 0 && y < getHeight());
+    }
 
-                    Pixel2D[] directions = directions(p);
-                    for (Pixel2D d : directions) {
-                        int x = d.getX(), y = d.getY();
-                        if (ans.getPixel(d)==-1 && getPixel(d)!=obsColor) {
-                            ans.setPixel(x, y,ans.getPixel(p) + 1 );
-                            q.addLast(new Index2D(x,y));
-                        }
-                    }
+    /**
+     * @return true if map edges wrap around (Cyclic), false otherwise.
+     */
+    @Override
+    public boolean isCyclic() {
+        return _cyclicFlag;
+    }
+
+    /**
+     * Enables or disables the cyclic (wrap-around) behavior of the map edges.
+     * @param cy The desired cyclic state.
+     */
+    @Override
+    public void setCyclic(boolean cy) {
+        _cyclicFlag = cy;
+    }
+
+    /**
+     * Generates a distance map where each pixel contains its shortest distance from the start point.
+     * Using Breadth-First Search (BFS), this method marks the starting point with 0 and expands
+     * outwards to all reachable pixels that are NOT of the specified obsColor.
+     * Unreachable pixels and obstacles are marked with -1. This map is essential for
+     * pathfinding and AI movement logic.
+     * * @param start The source point to measure distance from.
+     * @param obsColor The pixel value that acts as a wall/obstacle.
+     * @return A Map2D object representing the grid of distances.
+     * @throws RuntimeException if the start point is outside the map.
+     */
+    @Override
+    public Map2D allDistance(Pixel2D start, int obsColor) {
+        if (!isInside(start)) { throw new RuntimeException("The point is not in map"); }
+
+        // Initialize a new map filled with -1 (representing unvisited/blocked)
+        Map2D ans = new Map(getWidth(), getHeight(), -1);
+        ans.setCyclic(isCyclic());
+
+        // If start is an obstacle, no paths can be calculated
+        if (getPixel(start) == obsColor) return ans;
+
+        ans.setPixel(start, 0);
+        ArrayDeque<Pixel2D> q = new ArrayDeque<>();
+        q.add(new Index2D(start));
+
+        while (!q.isEmpty()) {
+            Pixel2D p = q.removeFirst();
+            int currentDist = ans.getPixel(p);
+
+            Pixel2D[] neighbors = directions(p);
+            for (Pixel2D d : neighbors) {
+                // If the neighbor is unvisited and is not an obstacle
+                if (ans.getPixel(d) == -1 && getPixel(d) != obsColor) {
+                    ans.setPixel(d, currentDist + 1);
+                    q.addLast(d);
                 }
             }
         }
+        return ans;
+    }
 
-		return ans;
-	}
 
+
+    /**
+     * Calculates the neighbors of a pixel (Up, Down, Left, Right).
+     * This function handles boundary logic:
+     * - If isCyclic is true: coordinates wrap around (e.g., x=width-1 moves to x=0).
+     * - If isCyclic is false: coordinates are clamped to the edge.
+     * * @param p The source pixel.
+     * @return An array of exactly 4 Pixel2D objects representing neighbors.
+     */
     private Pixel2D[] directions(Pixel2D p) {
         int x = p.getX(), y = p.getY();
-        int w = getWidth()-1, h = getHeight()-1;
+        int w = getWidth() - 1, h = getHeight() - 1;
 
         Index2D[] ans = new Index2D[] {
-                new Index2D(x+1, y),
-                new Index2D(x-1, y),
-                new Index2D(x, y+1),
-                new Index2D(x, y-1)
+                new Index2D(x + 1, y),
+                new Index2D(x - 1, y),
+                new Index2D(x, y + 1),
+                new Index2D(x, y - 1)
         };
 
-        if (x==w) {
-            if (isCyclic()){
-                ans[0].setX(0);
-            }else{
-                ans[0].setX(w);
-            }
+        if (x == w) {
+            ans[0].setX(isCyclic() ? 0 : w);
         }
-        if (x==0) {
-            if (isCyclic()){
-                ans[1].setX(w);
-            }else{
-                ans[1].setX(0);
-            }
+        if (x == 0) {
+            ans[1].setX(isCyclic() ? w : 0);
         }
-        if (y==h) {
-            if (isCyclic()){
-                ans[2].setY(0);
-            }else{
-                ans[2].setY(h);
-            }
+        if (y == h) {
+            ans[2].setY(isCyclic() ? 0 : h);
         }
-        if (y==0) {
-            if (isCyclic()){
-                ans[3].setY(h);
-            }else{
-                ans[3].setY(0);
-            }
+        if (y == 0) {
+            ans[3].setY(isCyclic() ? h : 0);
         }
 
         return ans;

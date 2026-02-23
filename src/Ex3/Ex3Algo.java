@@ -257,17 +257,15 @@ public class Ex3Algo implements PacManAlgo{
     private static Index2D pixelOfColor(Map map , int color, int colorAbs, Index2D pos) {
         Index2D ans=null;
 
-        Map2D all = map.allDistance(pos,colorAbs);
-        int[][] board= map.getMap();
-        int[][] allMatrix = all.getMap();
+        Map2D dis = map.allDistance(pos,colorAbs);
 
-        for(int x=0;x<allMatrix.length;x++){
-            for(int y=0;y<allMatrix[0].length;y++){
-                if(board[x][y]==color) {
+        for(int x=0;x<dis.getWidth();x++){
+            for(int y=0;y<dis.getHeight();y++){
+                if(map.getPixel(x,y)==color) {
                     if (ans == null) {
                         ans = new Index2D(x, y);
                     }
-                    if (allMatrix[x][y] -1 < allMatrix[ans.getX()][ans.getY()]) {
+                    if (dis.getPixel(x,y) -1 < dis.getPixel(ans.getX(),ans.getY())) {
                         ans = new Index2D(x, y);
                     }
                 }
