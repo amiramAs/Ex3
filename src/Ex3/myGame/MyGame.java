@@ -104,16 +104,12 @@ public class MyGame implements PacmanGame {
     public String move(int i) {
         String ans = "";
         if (_status == PLAY) {
-            // 1. עדכון מיקום וכיוון השחקן
             updatePlayerState(i);
 
-            // 2. טיפול באינטראקציה עם המפה (נקודות/בונוסים)
             handleMapPixels();
 
-            // 3. עדכון רוחות (תנועה, התנגשויות וזמנים)
             updateGhostsLogic(i);
 
-            // 4. בדיקה אם המשחק נגמר (ניצחון)
             checkVictoryCondition();
         }
         return ans;

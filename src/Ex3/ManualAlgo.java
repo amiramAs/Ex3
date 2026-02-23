@@ -30,17 +30,7 @@ public class ManualAlgo implements PacManAlgo{
             if (cmd == 'd') {ans  = PacmanGame.RIGHT;}
         }
 
-        GhostCL[] ghosts = game.getGhosts(0);
-        printGhosts(ghosts);
-
-
-
         return  ans;
     }
-    private static void printGhosts(GhostCL[] gs) {
-        for(int i=0;i<gs.length;i++){
-            GhostCL g = gs[i];
-            System.out.println(i+") status: "+g.getStatus()+",  type: "+g.getType()+",  pos: "+g.getPos(0)+",  time: "+g.remainTimeAsEatable(0));
-        }
-    }
+
 }

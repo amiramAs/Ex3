@@ -27,7 +27,7 @@ class MyGameTest {
     }
 
     @Test
-    void testMovement() {
+    void testMove() {
         game.setStatus(1);
         game.move(4);
         assertEquals(3, game.getPos2D(0).getX());
@@ -48,7 +48,7 @@ class MyGameTest {
     void testEatPinkDot() {
         game.setStatus(1);
         Index2D dotPos = new Index2D(3, 2);
-        map.setPixel(dotPos, 3); // 3 זה PINK
+        map.setPixel(dotPos, 3);
 
         game.move(4);
 
@@ -64,6 +64,6 @@ class MyGameTest {
 
         game.move(4);
 
-        assertEquals(4, game.getStatus(), "הסטטוס אמור להיות LOSS (4) בעקבות התנגשות ברוח");
+        assertEquals(4, game.getStatus());
     }
 }
